@@ -7,17 +7,21 @@ bool stringComplete = false;
 String commandString = "";
 
 float NUM_LEDS = 0;
-float NUM_TIMES = 0;
+float reps = 0;
 float DIST = 0;
+//float totalLaps = 0;
 float INTERVAL = 0.0;
 float REST = 0;
 bool start = false;
 float startMillis;
 float currentMillis;
 float period = 0.0;
+//int num_times = 0;
 boolean isConnected = false;
 CRGB startColor = CRGB::Blue;
 CRGB raceColor = CRGB::Green;
+
+int lapCount = 0;
 
 int dot = 0;
 
@@ -27,11 +31,6 @@ void setup() {
  Serial.begin(9600);
  FastLED.addLeds<WS2812B, 7>(leds,750);
  startMillis = millis();
- //Delete Later
- /*INTERVAL = 20;
- NUM_LEDS = 150;
- DIST = 1;
- period = 2*(INTERVAL*1000)/(NUM_LEDS*DIST);*/
 }
 
 void loop() {
@@ -44,7 +43,7 @@ void loop() {
 
   if(start) { //Start
     currentMillis = millis();
-    if((currentMillis - startMillis) >= period && dot < NUM_LEDS - 9) {
+    if (lapCount < DIST && !(lapCount % 2) && (currentMillis - startMillis) >= period && dot < (NUM_LEDS - 9)) {
         leds[dot] = raceColor;
         leds[dot+1] = raceColor;
         leds[dot+2] = raceColor;
@@ -69,18 +68,17 @@ void loop() {
         dot = dot + 2;
         startMillis = currentMillis;
     }
-
-   /* else if(currentMillis - startMillis >= period && dot >= 0 && i%2 == 1 && i < DIST && k < NUM_TIMES){
-        leds[dot] = CRGB::Green;
-        leds[dot-1] = CRGB::Green;
-        leds[dot-2] = CRGB::Green;
-        leds[dot-3] = CRGB::Green;
-        leds[dot-4] = CRGB::Green;
-        leds[dot-5] = CRGB::Green;
-        leds[dot-6] = CRGB::Green;
-        leds[dot-7] = CRGB::Green;
-        leds[dot-8] = CRGB::Green;
-        leds[dot-9] = CRGB::Green;
+    else if (lapCount < DIST && (lapCount % 2) && (currentMillis - startMillis) >= period && dot >= 10){
+        leds[dot] = raceColor;
+        leds[dot-1] = raceColor;
+        leds[dot-2] = raceColor;
+        leds[dot-3] = raceColor;
+        leds[dot-4] = raceColor;
+        leds[dot-5] = raceColor;
+        leds[dot-6] = raceColor;
+        leds[dot-7] = raceColor;
+        leds[dot-8] = raceColor;
+        leds[dot-9] = raceColor;
         FastLED.show();
         leds[dot] = CRGB::Black;
         leds[dot-1] = CRGB::Black;
@@ -92,15 +90,31 @@ void loop() {
         leds[dot-7] = CRGB::Black;
         leds[dot-8] = CRGB::Black;
         leds[dot-9] = CRGB::Black;
-        dot--;
+        dot = dot - 2;
         startMillis = currentMillis;
-    }*/
-    if(dot >= NUM_LEDS - 9) {
-      dot = 0;
-      start = false;
     }
+
+    if (!(lapCount % 2) && dot >= (NUM_LEDS - 9))
+        {
+            lapCount++;
+        }
+        else if ((lapCount % 2) && dot < 10)
+        {
+            lapCount++;
+        }
+    if (lapCount >= DIST){
+      start = false;
+      dot = 0;
+      lapCount=0;
+    }
+    /*else if ((int)lapCount % ((int)(num_times-1)) == 0){
+      num_times+= reps;
+      delay(REST*1000);
+      starter();
+    }*/
+
+        }    
    }
-  }
 
 void getCommand() {
 if(commandString.length() > 0){
@@ -115,7 +129,7 @@ else if(commandString[0]=='1')
 //Gets the number of times to repeat set
 int a= my_atoi(commandString[1]);
 int b= my_atoi(commandString[2]);
-NUM_TIMES=(float)(a*10+b);
+reps=(float)(a*10+b);
 
 //Gets the "goal time" interval in seconds
 int m1=my_atoi(commandString[3]);
@@ -147,7 +161,9 @@ s2=my_atoi(commandString[15]);
 ms1=my_atoi(commandString[17]);
 ms2=my_atoi(commandString[18]);
 
-REST=1.0*((m1*600)+(m2*60)+(s1*10)+s2+(ms1*.1)+(ms2*.01));
+REST = (float)(((m1 * 10 + m2) * 60) + (s1 * 10) + s2);
+REST += (float)((ms1 * 10 + ms2)/100);
+REST -= INTERVAL;
 
 //Gets the distance to travel
 int d1=my_atoi(commandString[19]);
@@ -157,10 +173,14 @@ int d4=my_atoi(commandString[22]);
 
 DIST=(float)((((d1*1000)+(d2*100)+(d3*10)+d4))/25);
 
+//totalLaps=DIST*reps;
+//num_times = DIST;
+
 period = 2*(INTERVAL*1000)/(NUM_LEDS*DIST);
 
 int scolor = my_atoi(commandString[23]);
 int rcolor = my_atoi(commandString[24]);
+
 selectColor(scolor,rcolor);
 
 starter();
