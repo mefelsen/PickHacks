@@ -8,7 +8,6 @@ using System.Windows.Forms;
 using System.IO.Ports;
 using System.Management;
 using System.Diagnostics;
-using System.Threading;
 
 namespace WindowsFormsApplication1
 {
@@ -70,6 +69,16 @@ namespace WindowsFormsApplication1
             comboBox3.Items.Add(1650);
             comboBox3.SelectedIndex = 0;
 
+            //
+            //Initialize Color Options
+            //
+            comboBox4.Items.Add("Red");
+            comboBox4.Items.Add("Green");
+            comboBox4.Items.Add("Blue");
+            comboBox5.Items.Add("Red");
+            comboBox5.Items.Add("Green");
+            comboBox5.Items.Add("Blue");
+
         }
 
         void getAvailableComPorts()
@@ -85,6 +94,8 @@ namespace WindowsFormsApplication1
             maskedTextBox1.Enabled = false;
             maskedTextBox2.Enabled = false;
             button2.Enabled = false;
+            comboBox4.Enabled = false;
+            comboBox5.Enabled = false;
         }
 
         void enableControls()
@@ -95,6 +106,8 @@ namespace WindowsFormsApplication1
             maskedTextBox1.Enabled = true;
             maskedTextBox2.Enabled = true;
             button2.Enabled = true;
+            comboBox4.Enabled = true;
+            comboBox5.Enabled = true;
         }
 
         void sendtoArduino()
@@ -160,7 +173,32 @@ namespace WindowsFormsApplication1
                 
                 Debug.WriteLine("Distance: " + s_dist);
             }
-           
+
+            if(comboBox4.SelectedIndex == 0)
+            {
+                command += "0";
+            }
+            else if(comboBox4.SelectedIndex == 1)
+            {
+                command += "1";
+            }
+            else if (comboBox4.SelectedIndex == 2)
+            {
+                command += "2";
+            }
+            if (comboBox5.SelectedIndex == 0)
+            {
+                command += "0";
+            }
+            else if (comboBox5.SelectedIndex == 1)
+            {
+                command += "1";
+            }
+            else if (comboBox5.SelectedIndex == 2)
+            {
+                command += "2";
+            }
+
             command += '\n';
             port.Write(command);
             Debug.WriteLine(command);
@@ -281,5 +319,7 @@ namespace WindowsFormsApplication1
                 
             }
         }
+
+        
     }
 }

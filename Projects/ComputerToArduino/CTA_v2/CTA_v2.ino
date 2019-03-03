@@ -16,6 +16,8 @@ float startMillis;
 float currentMillis;
 float period = 0.0;
 boolean isConnected = false;
+CRGB startColor = CRGB::Blue;
+CRGB raceColor = CRGB::Green;
 
 int dot = 0;
 
@@ -39,19 +41,20 @@ void loop() {
     commandString = "";
     //Serial.print(commandString);
    }
+
   if(start) { //Start
     currentMillis = millis();
     if((currentMillis - startMillis) >= period && dot < NUM_LEDS - 9) {
-        leds[dot] = CRGB::Green;
-        leds[dot+1] = CRGB::Green;
-        leds[dot+2] = CRGB::Green;
-        leds[dot+3] = CRGB::Green;
-        leds[dot+4] = CRGB::Green;
-        leds[dot+5] = CRGB::Green;
-        leds[dot+6] = CRGB::Green;
-        leds[dot+7] = CRGB::Green;
-        leds[dot+8] = CRGB::Green;
-        leds[dot+9] = CRGB::Green;
+        leds[dot] = raceColor;
+        leds[dot+1] = raceColor;
+        leds[dot+2] = raceColor;
+        leds[dot+3] = raceColor;
+        leds[dot+4] = raceColor;
+        leds[dot+5] = raceColor;
+        leds[dot+6] = raceColor;
+        leds[dot+7] = raceColor;
+        leds[dot+8] = raceColor;
+        leds[dot+9] = raceColor;
         FastLED.show();
         leds[dot] = CRGB::Black;
         leds[dot+1] = CRGB::Black;
@@ -104,8 +107,8 @@ if(commandString.length() > 0){
 //int cmdlength=23;
 //Gets the number of LEDs to trace
 if(commandString[0]=='0')
-  //NUM_LEDS=686;
-  NUM_LEDS=150;
+  NUM_LEDS=686;
+  //NUM_LEDS=150;
 else if(commandString[0]=='1')
   NUM_LEDS=750;
 
@@ -156,6 +159,11 @@ DIST=(float)((((d1*1000)+(d2*100)+(d3*10)+d4))/25);
 
 period = 2*(INTERVAL*1000)/(NUM_LEDS*DIST);
 
+int scolor = my_atoi(commandString[23]);
+int rcolor = my_atoi(commandString[24]);
+selectColor(scolor,rcolor);
+
+starter();
 
 start = true;
 }
@@ -184,6 +192,95 @@ int my_atoi(char val){
     case '9':
     return 9;
   }
+}
+
+void selectColor(int scolor,int rcolor){
+  switch(scolor){
+    case 0:
+    {
+      startColor = CRGB::Green;
+      break;
+    }
+    case 1:
+    {
+      startColor = CRGB::Red;
+      break;
+    }
+    case 2:
+    {
+      startColor = CRGB::Blue;
+      break;
+    }
+  }
+ switch(rcolor){
+    case 0:
+    {
+      raceColor = CRGB::Green;
+      break;
+    }
+    case 1:
+    {
+      raceColor = CRGB::Red;
+      break;
+    }
+    case 2:
+    {
+      raceColor = CRGB::Blue;
+      break;
+    }
+  } 
+}
+void starter(){
+        leds[dot] = startColor;
+        leds[dot+1] = startColor;
+        leds[dot+2] = startColor;
+        leds[dot+3] = startColor;
+        leds[dot+4] = startColor;
+        leds[dot+5] = startColor;
+        leds[dot+6] = startColor;
+        leds[dot+7] = startColor;
+        leds[dot+8] = startColor;
+        leds[dot+9] = startColor;
+        FastLED.show();
+        leds[dot] = CRGB::Black;
+        leds[dot+1] = CRGB::Black;
+        leds[dot+2] = CRGB::Black;
+        leds[dot+3] = CRGB::Black;
+        leds[dot+4] = CRGB::Black;
+        leds[dot+5] = CRGB::Black;
+        leds[dot+6] = CRGB::Black;
+        leds[dot+7] = CRGB::Black;
+        leds[dot+8] = CRGB::Black;
+        leds[dot+9] = CRGB::Black;
+        delay(500);
+        FastLED.show();
+        delay(500);
+        leds[dot] = startColor;
+        leds[dot+1] = startColor;
+        leds[dot+2] = startColor;
+        leds[dot+3] = startColor;
+        leds[dot+4] = startColor;
+        leds[dot+5] = startColor;
+        leds[dot+6] = startColor;
+        leds[dot+7] = startColor;
+        leds[dot+8] = startColor;
+        leds[dot+9] = startColor;
+        FastLED.show();
+        leds[dot] = CRGB::Black;
+        leds[dot+1] = CRGB::Black;
+        leds[dot+2] = CRGB::Black;
+        leds[dot+3] = CRGB::Black;
+        leds[dot+4] = CRGB::Black;
+        leds[dot+5] = CRGB::Black;
+        leds[dot+6] = CRGB::Black;
+        leds[dot+7] = CRGB::Black;
+        leds[dot+8] = CRGB::Black;
+        leds[dot+9] = CRGB::Black;
+        delay(500);
+        FastLED.show();
+        delay(500);
+        
+        
 }
 
 void serialEvent() {
