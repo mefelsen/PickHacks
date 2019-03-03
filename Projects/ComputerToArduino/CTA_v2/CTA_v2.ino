@@ -7,9 +7,11 @@ bool stringComplete = false;
 String commandString = "";
 
 float NUM_LEDS = 0;
+boolean even =false;
 float reps = 0;
 float DIST = 0;
-//float totalLaps = 0;
+int currentLengths = 0;
+int currentReps = 0;
 float INTERVAL = 0.0;
 float REST = 0;
 bool start = false;
@@ -20,8 +22,6 @@ float period = 0.0;
 boolean isConnected = false;
 CRGB startColor = CRGB::Blue;
 CRGB raceColor = CRGB::Green;
-
-int lapCount = 0;
 
 int dot = 0;
 
@@ -43,7 +43,7 @@ void loop() {
 
   if(start) { //Start
     currentMillis = millis();
-    if (lapCount < DIST && !(lapCount % 2) && (currentMillis - startMillis) >= period && dot < (NUM_LEDS - 9)) {
+    if ((currentLengths < DIST)&& !(even) && (currentMillis - startMillis) >= period && dot < (NUM_LEDS - 9)) {
         leds[dot] = raceColor;
         leds[dot+1] = raceColor;
         leds[dot+2] = raceColor;
@@ -68,7 +68,7 @@ void loop() {
         dot = dot + 2;
         startMillis = currentMillis;
     }
-    else if (lapCount < DIST && (lapCount % 2) && (currentMillis - startMillis) >= period && dot >= 10){
+    else if ((currentLengths < DIST) && (even) && (currentMillis - startMillis) >= period && dot >= 10){
         leds[dot] = raceColor;
         leds[dot-1] = raceColor;
         leds[dot-2] = raceColor;
@@ -94,20 +94,34 @@ void loop() {
         startMillis = currentMillis;
     }
 
-    if (!(lapCount % 2) && dot >= (NUM_LEDS - 9))
+    if (!(even) && dot >= (NUM_LEDS - 9))
         {
-            lapCount++;
+            currentLengths++;
+            even=true;
+            dot=NUM_LEDS-9;
+            
         }
-        else if ((lapCount % 2) && dot < 10)
+    else if (even && dot < 10)
         {
-            lapCount++;
+            currentLengths++;
+            even=false;
+            dot=0;
         }
-    if (lapCount >= DIST){
+    if(currentReps >= (reps-1) && currentLengths >= DIST) {
       start = false;
       dot = 0;
-      lapCount=0;
+      currentLengths = 0;
+      currentReps = 0;
     }
-    /*else if ((int)lapCount % ((int)(num_times-1)) == 0){
+    if (currentLengths >= DIST && currentReps<(reps-1)){
+      start = true;
+      currentLengths=0;
+      currentReps++;
+      delay(REST*1000);
+      starter();
+    }
+    
+    /*else if ((int)currentLengths % ((int)(num_times-1)) == 0){
       num_times+= reps;
       delay(REST*1000);
       starter();
@@ -173,8 +187,6 @@ int d4=my_atoi(commandString[22]);
 
 DIST=(float)((((d1*1000)+(d2*100)+(d3*10)+d4))/25);
 
-//totalLaps=DIST*reps;
-//num_times = DIST;
 
 period = 2*(INTERVAL*1000)/(NUM_LEDS*DIST);
 
